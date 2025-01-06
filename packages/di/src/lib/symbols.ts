@@ -1,0 +1,2 @@
+export const INJECTABLE_METADATA = Symbol("INJECTABLE_METADATA");
+export const TEMP_INSTANCE = Symbol("TEMP_INSTANCE");
