@@ -1,53 +1,88 @@
+import { DIError } from "./errors.ts";
 import { Constructor } from "./types.ts";
-import { DIError, CircularDependencyError } from "./errors.ts";
 
-const resolutionChain: string[] = [];
+const instanceMap = new WeakMap<Constructor<any>, any>();
 
-export function createProxy<T extends object>(
+const TIMEOUT = 5000; // 5 second timeout for async initialization
+
+export async function createProxy<T extends object>(
   target: Constructor<T>,
-  tempInstance: any,
+  tempInstance: Record<string | symbol, any>,
   depsPromise: Promise<any[]>,
 ): Promise<T> {
-  // Note: Now returns Promise<T>
-  let resolvedInstance: T | null = null;
-  const error: Error | null = null;
+  // Return existing proxy if we have one
+  const existingProxy = instanceMap.get(target);
+  if (existingProxy) {
+    return existingProxy;
+  }
 
-  // First, create and resolve the actual instance
-  const instancePromise = (async () => {
-    if (error) throw error;
-    if (!resolvedInstance) {
-      if (resolutionChain.includes(target.name)) {
-        const index = resolutionChain.indexOf(target.name);
-        const circle = [...resolutionChain.slice(index), target.name];
-        throw new CircularDependencyError(circle);
+  let resolvedInstance: T | undefined;
+
+  // Create prototype-preserving proxy
+  const proxy = new Proxy(Object.create(target.prototype), {
+    get(_, prop: string | symbol) {
+      if (prop === Symbol.hasInstance) {
+        return (instance: any) => instance instanceof target;
       }
 
-      resolutionChain.push(target.name);
+      return resolvedInstance
+        ? Reflect.get(resolvedInstance, prop)
+        : Reflect.get(tempInstance, prop);
+    },
+    set(_, prop: string | symbol, value: any) {
+      if (resolvedInstance) {
+        return Reflect.set(resolvedInstance, prop, value);
+      }
+      return Reflect.set(tempInstance, prop, value);
+    },
+    getPrototypeOf() {
+      return target.prototype;
+    },
+  });
 
-      try {
-        const deps = await Promise.race([
-          depsPromise,
-          new Promise((_, reject) =>
-            setTimeout(
-              () => reject(new DIError("Dependency resolution timeout")),
-              5000,
-            ),
-          ),
-        ]);
+  // Store proxy right away
+  instanceMap.set(target, proxy);
 
-        if (!Array.isArray(deps)) {
-          throw new DIError("Dependencies resolved to non-array", { deps });
-        }
+  try {
+    const deps = await depsPromise;
 
-        resolvedInstance = new target(...deps);
-        Object.assign(resolvedInstance, tempInstance);
-        return resolvedInstance;
-      } finally {
-        resolutionChain.pop();
+    // Create instance with timeout for async constructors
+    const instancePromise = Promise.resolve().then(async () => {
+      const instance = new target(...deps);
+
+      // If constructor returns a promise, wait for it
+      if (instance instanceof Promise) {
+        return await instance;
+      }
+
+      return instance;
+    });
+
+    // Race against timeout
+    resolvedInstance = await Promise.race([
+      instancePromise,
+      new Promise<never>((_, reject) =>
+        setTimeout(
+          () =>
+            reject(new DIError(`Initialization timeout for ${target.name}`)),
+          TIMEOUT,
+        ),
+      ),
+    ]);
+
+    // Copy temp properties to resolved instance
+    for (const [key, value] of Object.entries(tempInstance)) {
+      if (!(key in resolvedInstance)) {
+        (resolvedInstance as any)[key] = value;
       }
     }
-    return resolvedInstance;
-  })();
 
-  return instancePromise;
+    return proxy as T;
+  } catch (err) {
+    instanceMap.delete(target);
+    if (err instanceof Error) {
+      throw new DIError(`Failed to instantiate ${target.name}: ${err.message}`);
+    }
+    throw err;
+  }
 }
