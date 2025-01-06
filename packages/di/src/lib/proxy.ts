@@ -3,7 +3,7 @@ import { Constructor } from "./types.ts";
 
 const instanceMap = new WeakMap<Constructor<any>, any>();
 
-const TIMEOUT = 5000; // 5 second timeout for async initialization
+const TIMEOUT = 5000;
 
 export async function createProxy<T extends object>(
   target: Constructor<T>,
