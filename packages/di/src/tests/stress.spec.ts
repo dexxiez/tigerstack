@@ -1,3 +1,5 @@
+ 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   Inject,
   inject,
@@ -5,6 +7,7 @@ import {
   DIError,
   CircularDependencyError,
 } from "../index.ts";
+import { getMetadata, setMetadata } from "../lib/metadata.ts";
 
 // Basic test classes
 class DatabaseService {
@@ -68,21 +71,26 @@ describe("Dependency Injection System", () => {
   });
 
   // Circular dependencies
-  //describe("Circular Dependencies", () => {
-  //  @Inject(ServiceY)
-  //  class ServiceX {
-  //    constructor(public y: ServiceY) {}
-  //  }
-  //
-  //  @Inject(ServiceX)
-  //  class ServiceY {
-  //    constructor(public x: ServiceX) {}
-  //  }
-  //
-  //  it("should detect circular dependencies", async () => {
-  //    await expect(inject(ServiceX)).rejects.toThrow(CircularDependencyError);
-  //  });
-  //});
+  describe("Circular Dependencies", () => {
+    it("should detect circular dependencies", async () => {
+      @Inject(forwardRef(() => ServiceC))
+      class ServiceA {
+        constructor(public c: any) {}
+      }
+
+      @Inject(ServiceA)
+      class ServiceB {
+        constructor(public a: ServiceA) {}
+      }
+
+      @Inject(ServiceB)
+      class ServiceC {
+        constructor(public b: ServiceB) {}
+      }
+
+      await expect(inject(ServiceA)).rejects.toThrow(CircularDependencyError);
+    });
+  });
 
   // Deep dependency chain
   describe("Deep Dependencies", () => {

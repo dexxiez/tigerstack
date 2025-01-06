@@ -1,55 +1,85 @@
-import { Constructor, ForwardRef } from "./types.ts";
+import { Constructor, ForwardRef, DependencyToken } from "./types.ts";
 import { getMetadata, setMetadata } from "./metadata.ts";
 import { createProxy } from "./proxy.ts";
 import { TEMP_INSTANCE } from "./symbols.ts";
+import { CircularDependencyError } from "./errors.ts";
+
+function isForwardRef(dep: DependencyToken<any>): dep is ForwardRef<any> {
+  return typeof dep === "function" && !dep.prototype;
+}
 
 export async function inject<T extends object>(
   target: Constructor<T>,
+  resolutionChain: string[] = [],
+  forwardRefs: Set<string> = new Set(),
 ): Promise<T> {
   const metadata = getMetadata(target);
 
-  // If we have a fully resolved instance, return it
   if (metadata.instance && !metadata[TEMP_INSTANCE]) {
     return metadata.instance;
   }
 
-  // If we're already resolving and have a temp instance, return it
-  if (metadata.resolving && metadata[TEMP_INSTANCE]) {
-    return metadata[TEMP_INSTANCE];
+  const currentDep = target.name;
+  const existingIndex = resolutionChain.indexOf(currentDep);
+
+  if (existingIndex !== -1) {
+    const cycle = [...resolutionChain.slice(existingIndex), currentDep];
+
+    // For each pair of dependencies in the cycle, check if there's a forward ref
+    let hasValidForwardRefs = true;
+    for (let i = 0; i < cycle.length - 1; i++) {
+      const current = cycle[i];
+      const next = cycle[i + 1];
+
+      // If neither dependency in this pair uses forward refs, the cycle is invalid
+      if (!forwardRefs.has(current) && !forwardRefs.has(next)) {
+        hasValidForwardRefs = false;
+        break;
+      }
+    }
+
+    if (!hasValidForwardRefs) {
+      throw new CircularDependencyError(cycle);
+    }
+
+    // Valid cycle with forward refs
+    if (metadata[TEMP_INSTANCE] && metadata.resolving) {
+      return metadata[TEMP_INSTANCE];
+    }
   }
 
-  // Create temp instance right away to handle circular deps
+  const currentChain = [...resolutionChain, currentDep];
+
+  // Create temp instance and proxy right away
   const tempInstance = {};
   const proxy = await createProxy(target, tempInstance, Promise.resolve([]));
 
-  // Update metadata with temp instance
-  metadata.resolving = true;
-  metadata[TEMP_INSTANCE] = proxy;
-  metadata.instance = proxy; // Important: set instance to proxy right away
-  setMetadata(target, metadata);
-
   try {
-    // Resolve all dependencies
+    metadata.resolving = true;
+    metadata[TEMP_INSTANCE] = proxy;
+    metadata.instance = proxy;
+    setMetadata(target, metadata);
+
+    // Track dependencies that use forward refs
+    const dependencies = metadata.dependencies ?? [];
+    dependencies.forEach((dep) => {
+      if (isForwardRef(dep)) {
+        const actualDep = dep();
+        forwardRefs.add(actualDep.name);
+      }
+    });
+
     const deps = await Promise.all(
-      (metadata.dependencies ?? []).map(async (dep) => {
-        const actualDep =
-          typeof dep === "function" && !dep.prototype
-            ? (dep as ForwardRef<any>)()
-            : (dep as Constructor<any>);
-        return inject(actualDep);
+      dependencies.map(async (dep) => {
+        const actualDep = isForwardRef(dep) ? dep() : dep;
+        return inject(actualDep, currentChain, forwardRefs);
       }),
     );
 
-    // Create the actual instance
     const realInstance = new target(...deps);
-
-    // Copy any properties from temp instance to real instance
     Object.assign(realInstance, tempInstance);
-
-    // Update proxy target to real instance
     Object.assign(proxy, realInstance);
 
-    // Clean up metadata
     metadata.resolving = false;
     metadata[TEMP_INSTANCE] = undefined;
     metadata.instance = proxy;
