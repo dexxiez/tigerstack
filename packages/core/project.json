@@ -4,8 +4,17 @@
   "projectType": "library",
   "name": "core",
   "targets": {
+    "type-check": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["^build"],
+      "options": {
+        "cwd": "packages/core",
+        "commands": ["tsc --noEmit"]
+      }
+    },
     "build": {
       "executor": "nx:run-commands",
+      "dependsOn": ["^build"],
       "options": {
         "cwd": "packages/core",
         "commands": ["tsup"]
