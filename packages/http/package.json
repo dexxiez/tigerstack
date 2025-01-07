@@ -3,7 +3,10 @@
   "version": "0.0.1",
   "private": true,
   "dependencies": {
-    "tslib": "^2.3.0"
+    "koa": "2.15.3",
+    "tslib": "^2.3.0",
+    "@tigerstack/core": "workspace:*",
+    "@tigerstack/di": "workspace:*"
   },
   "type": "module",
   "main": "./dist/index.js",
@@ -16,5 +19,8 @@
     }
   },
   "types": "./dist/index.d.ts",
-  "module": "./dist/index.js"
+  "module": "./dist/index.js",
+  "devDependencies": {
+    "@types/koa": "2.15.0"
+  }
 }

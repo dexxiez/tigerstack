@@ -4,8 +4,33 @@
   "sourceRoot": "packages/http/src",
   "projectType": "library",
   "targets": {
+    "type-check": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["^build"],
+      "options": {
+        "cwd": "packages/http",
+        "commands": ["tsc --noEmit"]
+      }
+    },
+    "dev": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["^build"],
+      "options": {
+        "cwd": "packages/http",
+        "commands": ["tsx watch src/index.ts"]
+      }
+    },
+    "testing": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["^build"],
+      "options": {
+        "cwd": "packages/http",
+        "commands": ["tsx watch src/testing.ts"]
+      }
+    },
     "build": {
       "executor": "nx:run-commands",
+      "dependsOn": ["^build"],
       "options": {
         "cwd": "packages/http",
         "commands": ["tsup"]
