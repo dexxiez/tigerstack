@@ -16,7 +16,7 @@ export default defineConfig({
   },
   minify: true,
   sourcemap: true,
-  splitting: true,
+  splitting: false,
   treeshake: true,
   clean: true,
   external: ["koa"],

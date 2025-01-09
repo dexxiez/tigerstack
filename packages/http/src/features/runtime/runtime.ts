@@ -1,25 +1,24 @@
-import { Inject } from "@tigerstack/di";
+import { Inject } from "@tigerstack/core/di";
 import { RuntimeLogger } from "./runtime-logger.ts";
 import { MiddlewarePipeline } from "../middleware/pipeline.ts";
-import { HttpServer, ServerConfig } from "../../types/server.interfaces.ts";
+import { HttpServer, HttpServerConfig } from "../../types/server.interfaces.ts";
 import { Middleware } from "../middleware/middleware.ts";
 import { KoaAdapter } from "../../adapters/koa/index.ts";
+import { defaultConfig } from "./runtime-defaults.ts";
 
-@Inject()
+@Inject(RuntimeLogger)
 export class Runtime {
   private readonly pipeline: MiddlewarePipeline;
-  private config: ServerConfig;
+  private server?: HttpServer;
+  private config: HttpServerConfig = defaultConfig;
   private started = false;
 
-  constructor(
-    private logger: RuntimeLogger,
-    private server: HttpServer,
-    config: Partial<ServerConfig> = {},
-  ) {
+  constructor(private logger: RuntimeLogger) {
     this.pipeline = new MiddlewarePipeline();
-    this.config = {
-      port: config.port ?? 3000,
-    };
+  }
+
+  async initialize() {
+    this.server = await KoaAdapter.create();
   }
 
   registerMiddleware(middleware: Middleware): void {
@@ -29,7 +28,7 @@ export class Runtime {
     this.pipeline.register(middleware);
   }
 
-  configure(partialConfig: Partial<ServerConfig>): void {
+  configure(partialConfig: Partial<HttpServerConfig>): void {
     if (this.started) {
       this.logger.error("Cannot configure server after it has started");
       return;
@@ -42,12 +41,16 @@ export class Runtime {
   }
 
   async start(): Promise<void> {
+    if (!this.server) {
+      throw new Error("Server not initialized");
+    }
+
     if (this.started) {
       this.logger.error("Server already started");
       return;
     }
 
-    // Now we're working with the abstraction, not the concrete Koa implementation
+    // Now we're working with the abstraction soon (tm), not the concrete Koa implementation
     if ("createPipelineMiddleware" in this.server) {
       const middleware = (this.server as KoaAdapter).createPipelineMiddleware(
         this.pipeline,

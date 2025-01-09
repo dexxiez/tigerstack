@@ -1,17 +1,21 @@
-import { inject } from "@tigerstack/di";
+import { Inject } from "@tigerstack/core/di";
 import { Runtime } from "./features/runtime/runtime.ts";
-import { ServerConfig } from "./types/server.interfaces.ts";
+import { HttpServerConfig } from "./types/server.interfaces.ts";
 import { Middleware } from "./features/middleware/middleware.ts";
+import type { ConfigurableModule } from "@tigerstack/core";
+import { AssertDominanceMiddleware } from "./middleware/assert-dominance.ts";
 
-export class TigerHTTP {
-  private config: ServerConfig = {
-    port: 3000,
-  };
+@Inject(Runtime)
+export class HTTPTigerMod
+  implements ConfigurableModule<Partial<HttpServerConfig>>
+{
   private middleware: Middleware[] = [];
+  private config: Partial<HttpServerConfig> = {};
 
-  setPort(port: number): this {
-    this.config.port = port;
-    return this;
+  constructor(private runtime: Runtime) {}
+
+  configure(config: Partial<HttpServerConfig>): void {
+    this.config = config;
   }
 
   use(middleware: Middleware): this {
@@ -19,16 +23,17 @@ export class TigerHTTP {
     return this;
   }
 
-  async start(): Promise<Runtime> {
-    const runtime = await inject(Runtime);
+  async onBootstrap(): Promise<void> {
+    await this.runtime.initialize();
+    this.runtime.configure(this.config);
 
-    // Configure runtime with our saved settings
-    runtime.configure(this.config);
+    this.getInternalMiddleware().map((m) => this.runtime.registerMiddleware(m));
+    this.middleware.map((m) => this.runtime.registerMiddleware(m));
 
-    // Register all middleware
-    this.middleware.forEach((m) => runtime.registerMiddleware(m));
+    return this.runtime.start();
+  }
 
-    await runtime.start();
-    return runtime;
+  private getInternalMiddleware(): Middleware[] {
+    return [new AssertDominanceMiddleware()];
   }
 }

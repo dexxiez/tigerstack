@@ -5,11 +5,13 @@ import type { HttpServer } from "../../types/server.interfaces.ts";
 import { MiddlewarePipeline } from "../../features/middleware/pipeline.ts";
 
 export class KoaAdapter implements HttpServer {
-  private server: Koa;
+  private server: Koa | undefined;
 
-  constructor() {
-    const Koa = require("koa");
-    this.server = new Koa();
+  static async create(): Promise<KoaAdapter> {
+    const adapter = new KoaAdapter();
+    const { default: Koa } = await import("koa");
+    adapter.server = new Koa();
+    return adapter;
   }
 
   static handleRequest(ctx: Context): HttpRequest {
@@ -31,10 +33,16 @@ export class KoaAdapter implements HttpServer {
   }
 
   use(handler: unknown): void {
+    if (!this.server) {
+      throw new Error("Koa Server not initialized");
+    }
     this.server.use(handler as Koa.Middleware);
   }
 
   listen(port: number, callback: () => void): void {
+    if (!this.server) {
+      throw new Error("Koa Server not initialized");
+    }
     this.server.listen(port, callback);
   }
 

@@ -1,7 +1,12 @@
 // THIS FILE IS FOR DEVELOPMENT AND SERVES NO PERMANENT PURPOSE
 
-import { TigerHTTP } from "./server.ts";
+import { TigerStack } from "@tigerstack/core";
+import { HTTPTigerMod } from "./server.ts";
 
-const server = new TigerHTTP(3000);
+const app = new TigerStack({ debug: true });
 
-server.start();
+app
+  .register(HTTPTigerMod, {
+    port: 3000,
+  })
+  .bootstrap();

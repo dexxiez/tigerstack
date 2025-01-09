@@ -5,8 +5,7 @@
   "type": "module",
   "dependencies": {
     "tslib": "^2.3.0",
-    "@tigerstack/core": "workspace:*",
-    "@tigerstack/di": "workspace:*"
+    "@tigerstack/core": "workspace:*"
   },
   "publishConfig": {
     "dependencies": {

@@ -1,5 +1,5 @@
 import { Logger } from "@tigerstack/core/logs";
-import { Inject } from "@tigerstack/di";
+import { Inject } from "@tigerstack/core/di";
 
 @Inject()
 export class RuntimeLogger {
