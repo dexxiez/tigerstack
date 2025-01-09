@@ -1,4 +1,4 @@
-import { Logger } from "@tigerstack/core";
+import { Logger } from "@tigerstack/core/logs";
 import { Inject } from "@tigerstack/di";
 
 @Inject()

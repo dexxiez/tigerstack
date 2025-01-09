@@ -1,8 +1,8 @@
+import { Middleware } from "../features/middleware/middleware.ts";
 import { HTTP_STATUS } from "../constants/http.ts";
 import { HttpRequest, HttpResponse } from "../interfaces/http.ts";
-import { MiddlewareButNotInAGayWay } from "../interfaces/middleware.ts";
 
-export class AssertDominanceMiddleware implements MiddlewareButNotInAGayWay {
+export class AssertDominanceMiddleware implements Middleware {
   name = "AssertDominanceMiddleware";
   async request(req: HttpRequest): Promise<HttpRequest> {
     return req;
