@@ -1,6 +1,13 @@
 import { defineConfig } from "tsup";
+
+const features = ["logs", "errors"];
 export default defineConfig({
-  entry: ["src/index.ts"],
+  entry: {
+    index: "src/index.ts",
+    ...Object.fromEntries(
+      features.map((f) => [f + "/index", `src/features/${f}/index.ts`]),
+    ),
+  },
   format: ["cjs", "esm"],
   tsconfig: "./tsconfig.lib.json",
   dts: {
@@ -16,4 +23,9 @@ export default defineConfig({
   treeshake: true,
   clean: true,
   external: [],
+  outExtension({ format }) {
+    return {
+      js: format === "cjs" ? ".cjs" : ".js",
+    };
+  },
 });
