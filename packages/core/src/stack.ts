@@ -26,8 +26,8 @@ export class TigerStack {
 
   constructor(options: { debug?: boolean } = {}) {
     this.logger = new Logger({
-      showSeverity: true,
-      timestamp: options.debug ? "local" : false,
+      showSeverity: false,
+      timestamp: options.debug ? "timeOnly" : false,
     });
   }
 
@@ -44,6 +44,7 @@ export class TigerStack {
    */
   async bootstrap(): Promise<void> {
     try {
+      await new Promise((resolve) => setTimeout(resolve, 200));
       this.logger.info("Bootstrapping TigerStack...");
 
       // Initialize and configure all modules

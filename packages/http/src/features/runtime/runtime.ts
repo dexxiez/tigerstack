@@ -54,7 +54,7 @@ export class Runtime {
       return;
     }
 
-    this.controllerManager.findControllers();
+    this.controllerManager.loadControllers();
 
     // Now we're working with the abstraction soon (tm), not the concrete Koa implementation
     if ("createPipelineMiddleware" in this.server) {
