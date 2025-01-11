@@ -1,8 +1,9 @@
-import { Constructor, ForwardRef, DependencyToken } from "./types.ts";
+import { ForwardRef, DependencyToken } from "./types.ts";
 import { getMetadata, setMetadata } from "./metadata.ts";
 import { createProxy } from "./proxy.ts";
 import { TEMP_INSTANCE } from "./symbols.ts";
 import { CircularDependencyError } from "./errors.ts";
+import { Constructor } from "../internals/index.ts";
 
 function isForwardRef(dep: DependencyToken<any>): dep is ForwardRef<any> {
   return typeof dep === "function" && !dep.prototype;
@@ -85,7 +86,7 @@ export async function inject<T extends object>(
     metadata.instance = proxy;
     setMetadata(target, metadata);
 
-    return proxy;
+    return proxy as T;
   } catch (err) {
     metadata.resolving = false;
     metadata[TEMP_INSTANCE] = undefined;

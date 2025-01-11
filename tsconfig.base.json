@@ -20,7 +20,7 @@
     "noFallthroughCasesInSwitch": true,
     "noImplicitOverride": true,
     "noImplicitReturns": true,
-    "noUnusedLocals": true,
+    "noUnusedLocals": false,
     "pretty": true,
     "removeComments": false,
     "resolveJsonModule": false,

@@ -5,6 +5,7 @@
   "type": "module",
   "dependencies": {
     "chalk": "4.1.2",
+    "reflect-metadata": "0.2.2",
     "tslib": "^2.3.0"
   },
   "exports": {
@@ -12,6 +13,11 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
+    },
+    "./internals": {
+      "types": "./dist/internals/index.d.ts",
+      "import": "./dist/internals/index.js",
+      "require": "./dist/internals/index.cjs"
     },
     "./errors": {
       "types": "./dist/errors/index.d.ts",
@@ -32,6 +38,9 @@
   },
   "typesVersions": {
     "*": {
+      ".": [
+        "./dist/index.d.ts"
+      ],
       "errors": [
         "./dist/errors/index.d.ts"
       ],

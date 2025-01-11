@@ -1,5 +1,6 @@
-import { Constructor, InjectableMetadata } from "./types.ts";
+import { InjectableMetadata } from "./types.ts";
 import { INJECTABLE_METADATA } from "./symbols.ts";
+import { Constructor } from "../internals/index.ts";
 
 export function getMetadata(target: Constructor<any>): InjectableMetadata {
   return (target as any)[INJECTABLE_METADATA] ?? {};

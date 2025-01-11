@@ -4,8 +4,9 @@
   "private": false,
   "type": "module",
   "dependencies": {
-    "tslib": "^2.3.0",
-    "@tigerstack/core": "workspace:*"
+    "@tigerstack/core": "workspace:*",
+    "reflect-metadata": "0.2.2",
+    "tslib": "^2.3.0"
   },
   "publishConfig": {
     "dependencies": {
@@ -14,8 +15,8 @@
     }
   },
   "devDependencies": {
-    "koa": "^2.15.3",
-    "@types/koa": "2.15.0"
+    "@types/koa": "2.15.0",
+    "koa": "^2.15.3"
   },
   "peerDependencies": {
     "koa": "^2.15.3"

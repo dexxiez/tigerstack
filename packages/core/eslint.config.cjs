@@ -1,7 +1,9 @@
 const baseConfig = require("../../eslint.config.cjs");
+const projectConfig = require("../../packages.eslint.config.cjs");
 
 module.exports = [
   ...baseConfig,
+  ...projectConfig,
   {
     files: ["**/*.json"],
     rules: {

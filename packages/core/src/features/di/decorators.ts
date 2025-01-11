@@ -1,5 +1,6 @@
-import { Constructor, DependencyToken } from "./types.ts";
+import { DependencyToken } from "./types.ts";
 import { setMetadata } from "./metadata.ts";
+import { Constructor } from "../internals/index.ts";
 
 export function Inject(...dependencies: DependencyToken<any>[]) {
   return function (target: Constructor<any>) {

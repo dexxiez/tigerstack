@@ -1,6 +1,6 @@
+import { Constructor } from "../internals/index.ts";
 import { TEMP_INSTANCE } from "./symbols.ts";
 
-export type Constructor<T> = new (...args: any[]) => T;
 export type ForwardRef<T> = () => Constructor<T>;
 export type DependencyToken<T> = Constructor<T> | ForwardRef<T>;
 

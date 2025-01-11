@@ -1,4 +1,4 @@
-import { Constructor } from "@tigerstack/core/di";
+import { Constructor } from "@tigerstack/core";
 
 export interface HttpServerConfig {
   port: number;

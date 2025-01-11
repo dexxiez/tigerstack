@@ -1,5 +1,5 @@
 import { DIError } from "./errors.ts";
-import { Constructor } from "./types.ts";
+import { Constructor } from "../internals/index.ts";
 
 const instanceMap = new WeakMap<Constructor<any>, any>();
 

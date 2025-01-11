@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any -- Modular approach being defined so any is required to allow downstream to not hate life */
-import { Constructor, inject } from "./features/di/index.ts";
+import { inject } from "./features/di/index.ts";
 import { Logger } from "./features/logs/index.ts";
 import { FrameworkErrorHandler } from "./features/errors/index.ts";
+import { Constructor } from "./features/internals/index.ts";
 
 // Interface for modules that need config
 export interface ConfigurableModule<T = any> {

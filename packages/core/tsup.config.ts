@@ -1,6 +1,6 @@
 import { defineConfig } from "tsup";
 
-const features = ["di", "logs", "errors"];
+const features = ["internals", "di", "logs", "errors"];
 export default defineConfig({
   entry: {
     index: "src/index.ts",
