@@ -1,7 +1,7 @@
 import { Inject } from "@tigerstack/core/di";
 import { Runtime } from "./features/runtime/runtime.ts";
 import { HttpServerConfig } from "./types/server.interfaces.ts";
-import { Middleware } from "./features/middleware/middleware.ts";
+import { Middleware } from "./features/pipeline/middleware.ts";
 import type { ConfigurableModule } from "@tigerstack/core";
 import { AssertDominanceMiddleware } from "./middleware/assert-dominance.ts";
 

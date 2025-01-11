@@ -1,8 +1,6 @@
-import { Constructor } from "@tigerstack/core";
-
 export interface HttpServerConfig {
   port: number;
-  controllers: Constructor<unknown>[];
+  controllers: any[];
 }
 
 export interface HttpServer {

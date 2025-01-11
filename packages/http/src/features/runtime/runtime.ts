@@ -1,19 +1,23 @@
 import { Inject } from "@tigerstack/core/di";
 import { RuntimeLogger } from "./runtime-logger.ts";
-import { MiddlewarePipeline } from "../middleware/pipeline.ts";
+import { MiddlewarePipeline } from "../pipeline/request-pipeline.ts";
 import { HttpServer, HttpServerConfig } from "../../types/server.interfaces.ts";
-import { Middleware } from "../middleware/middleware.ts";
+import { Middleware } from "../pipeline/middleware.ts";
 import { KoaAdapter } from "../../adapters/koa/index.ts";
 import { defaultConfig } from "./runtime-defaults.ts";
+import { ControllerManager } from "../routing/controller-manager.ts";
 
-@Inject(RuntimeLogger)
+@Inject(RuntimeLogger, ControllerManager)
 export class Runtime {
   private readonly pipeline: MiddlewarePipeline;
   private server?: HttpServer;
-  private config: HttpServerConfig = defaultConfig;
+  config: HttpServerConfig = defaultConfig;
   private started = false;
 
-  constructor(private logger: RuntimeLogger) {
+  constructor(
+    private logger: RuntimeLogger,
+    private controllerManager: ControllerManager,
+  ) {
     this.pipeline = new MiddlewarePipeline();
   }
 
@@ -49,6 +53,8 @@ export class Runtime {
       this.logger.error("Server already started");
       return;
     }
+
+    this.controllerManager.findControllers();
 
     // Now we're working with the abstraction soon (tm), not the concrete Koa implementation
     if ("createPipelineMiddleware" in this.server) {

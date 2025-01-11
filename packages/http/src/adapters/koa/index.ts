@@ -2,7 +2,7 @@ import type { Context, Next } from "koa";
 import type Koa from "koa";
 import type { HttpRequest, HttpResponse } from "../../types/http.interfaces.ts";
 import type { HttpServer } from "../../types/server.interfaces.ts";
-import { MiddlewarePipeline } from "../../features/middleware/pipeline.ts";
+import { MiddlewarePipeline } from "../../features/pipeline/request-pipeline.ts";
 
 export class KoaAdapter implements HttpServer {
   private server: Koa | undefined;
