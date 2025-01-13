@@ -3,12 +3,15 @@ import type Koa from "koa";
 import type { HttpRequest, HttpResponse } from "../../types/http.interfaces.ts";
 import type { HttpServer } from "../../types/server.interfaces.ts";
 import { MiddlewarePipeline } from "../../features/pipeline/request-pipeline.ts";
+import { HttpErrorHandler } from "../../types/http-error-handler.interface.ts";
+import { v4 } from "uuid";
 
 export class KoaAdapter implements HttpServer {
   private server: Koa | undefined;
+  private httpErrorHandler: HttpErrorHandler;
 
-  static async create(): Promise<KoaAdapter> {
-    const adapter = new KoaAdapter();
+  static async create(httpErrorHandler: HttpErrorHandler): Promise<KoaAdapter> {
+    const adapter = new KoaAdapter(httpErrorHandler);
     const { default: Koa } = await import("koa");
     adapter.server = new Koa();
     return adapter;
@@ -32,6 +35,10 @@ export class KoaAdapter implements HttpServer {
     ctx.body = response.body;
   }
 
+  private constructor(httpErrorHandler: HttpErrorHandler) {
+    this.httpErrorHandler = httpErrorHandler;
+  }
+
   use(handler: unknown): void {
     if (!this.server) {
       throw new Error("Koa Server not initialized");
@@ -46,12 +53,22 @@ export class KoaAdapter implements HttpServer {
     this.server.listen(port, callback);
   }
 
-  createPipelineMiddleware(pipeline: MiddlewarePipeline) {
+  createPipeline(pipeline: MiddlewarePipeline) {
     return async (ctx: Context, next: Next) => {
-      const req = KoaAdapter.handleRequest(ctx);
-      const res = await pipeline.execute(req);
-      KoaAdapter.handleResponse(ctx, res);
-      await next();
+      this.addRequestId(ctx);
+      try {
+        const req = KoaAdapter.handleRequest(ctx);
+        const res = await pipeline.execute(req);
+        KoaAdapter.handleResponse(ctx, res);
+        await next();
+      } catch (error) {
+        const errRes = await this.httpErrorHandler.handle(error, ctx);
+        KoaAdapter.handleResponse(ctx, errRes);
+      }
     };
+  }
+
+  private addRequestId(ctx: Context): void {
+    ctx.set("X-Request-Id", v4());
   }
 }

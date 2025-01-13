@@ -21,4 +21,5 @@ export type HttpHeader =
   | "User-Agent"
   | "X-Forwarded-For"
   | "X-Requested-With"
+  | "X-Request-Id"
   | (string & {});

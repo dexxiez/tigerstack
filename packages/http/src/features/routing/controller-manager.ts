@@ -93,6 +93,8 @@ export class ControllerManager {
   }
 
   private reportControllers(): void {
+    if (this.invalidControllers.length === 0) return;
+
     const invalidTable = new Table({
       head: ["Invalid Controller Name", "Reason"],
       style: {
@@ -108,8 +110,7 @@ export class ControllerManager {
 
     console.info(invalidTable.toString());
 
-    if (this.invalidControllers.length > 0)
-      this.logger.error("There were invalid controllers found, check the logs");
+    this.logger.error("There were invalid controllers found, check the logs");
   }
   private isController(ctrl: any): boolean {
     return MetadataManager.getMetadata("type", ctrl) === "controller";

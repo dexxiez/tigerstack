@@ -1,4 +1,4 @@
-import { Middleware } from "../features/middleware/middleware.ts";
+import { Middleware } from "../features/pipeline/middleware.ts";
 import { HttpRequest, HttpResponse } from "../types/http.interfaces.ts";
 
 export class AssertDominanceMiddleware implements Middleware {

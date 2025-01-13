@@ -1,6 +1,7 @@
 export interface HttpServerConfig {
   port: number;
   controllers: any[];
+  logging?: "verbose" | false;
 }
 
 export interface HttpServer {

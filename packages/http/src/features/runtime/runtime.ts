@@ -6,8 +6,9 @@ import { Middleware } from "../pipeline/middleware.ts";
 import { KoaAdapter } from "../../adapters/koa/index.ts";
 import { defaultConfig } from "./runtime-defaults.ts";
 import { ControllerManager } from "../routing/controller-manager.ts";
+import { ErrorService } from "../errors/error.service.ts";
 
-@Inject(RuntimeLogger, ControllerManager)
+@Inject(RuntimeLogger, ControllerManager, ErrorService)
 export class Runtime {
   private readonly pipeline: MiddlewarePipeline;
   private server?: HttpServer;
@@ -17,12 +18,13 @@ export class Runtime {
   constructor(
     private logger: RuntimeLogger,
     private controllerManager: ControllerManager,
+    private errorService: ErrorService,
   ) {
     this.pipeline = new MiddlewarePipeline();
   }
 
   async initialize() {
-    this.server = await KoaAdapter.create();
+    this.server = await KoaAdapter.create(this.errorService);
   }
 
   registerMiddleware(middleware: Middleware): void {
@@ -56,12 +58,15 @@ export class Runtime {
 
     this.controllerManager.loadControllers();
 
-    // Now we're working with the abstraction soon (tm), not the concrete Koa implementation
-    if ("createPipelineMiddleware" in this.server) {
-      const middleware = (this.server as KoaAdapter).createPipelineMiddleware(
+    if ("createPipeline" in this.server) {
+      const middleware = (this.server as KoaAdapter).createPipeline(
         this.pipeline,
       );
-      this.server.use(middleware);
+      try {
+        this.server.use(middleware);
+      } catch (e) {
+        this.logger.error(`Error while applying middleware to server: ${e}`);
+      }
     }
 
     this.server.listen(this.config.port, () => {

@@ -3,7 +3,7 @@ import { HttpHeader, HttpMethod } from "./http.types.ts";
 export interface HttpRequest {
   method: HttpMethod;
   url: string;
-  headers: Record<HttpHeader, string>;
+  headers: Partial<Record<HttpHeader, string>>;
   body?: unknown;
 }
 

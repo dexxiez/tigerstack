@@ -14,7 +14,7 @@ export default defineConfig({
       tsBuildInfoFile: null,
     },
   },
-  minify: true,
+  minify: false,
   sourcemap: true,
   splitting: false,
   treeshake: true,
