@@ -3,8 +3,8 @@ import { Runtime } from "./features/runtime/runtime.ts";
 import { HttpServerConfig } from "./types/server.interfaces.ts";
 import { Middleware } from "./features/pipeline/middleware.ts";
 import type { ConfigurableModule } from "@tigerstack/core";
-import { AssertDominanceMiddleware } from "./middleware/assert-dominance.middleware.ts";
 import { RouterMiddleware } from "./middleware/router.middleware.ts";
+import { BannerMiddleware } from "./middleware/banner.middleware.ts";
 
 @Inject(Runtime, RouterMiddleware)
 export class HTTPTigerMod
@@ -38,6 +38,6 @@ export class HTTPTigerMod
   }
 
   private getInternalMiddleware(): Middleware[] {
-    return [new AssertDominanceMiddleware(), this.routerMiddleware];
+    return [new BannerMiddleware(), this.routerMiddleware];
   }
 }

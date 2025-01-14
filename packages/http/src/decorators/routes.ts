@@ -20,3 +20,10 @@ export const Controller = (
     return Inject(...dependencies)(target) as T;
   };
 };
+
+export const Get =
+  (routePath = "/") =>
+  (target: any, propertyKey: string) => {
+    MetadataManager.setMetadata("httpMethod", "GET", target, propertyKey);
+    MetadataManager.setMetadata("routePath", routePath, target, propertyKey);
+  };

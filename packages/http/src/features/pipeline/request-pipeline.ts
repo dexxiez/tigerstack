@@ -21,9 +21,9 @@ export class MiddlewarePipeline {
 
     // Here you'd actually handle the route and get a response
     let response: HttpResponse = {
-      status: 200,
+      status: 500,
       headers: {},
-      body: "Hello World",
+      body: "Internal Caught",
     };
 
     // Backward pass through middleware

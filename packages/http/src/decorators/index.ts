@@ -1,1 +1,1 @@
-export { Controller } from "./routes.ts";
+export { Controller, Get } from "./routes.ts";

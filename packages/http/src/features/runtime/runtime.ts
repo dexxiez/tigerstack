@@ -56,7 +56,7 @@ export class Runtime {
       return;
     }
 
-    this.controllerManager.loadControllers();
+    await this.controllerManager.loadControllers();
 
     if ("createPipeline" in this.server) {
       const middleware = (this.server as KoaAdapter).createPipeline(

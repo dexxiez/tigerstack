@@ -13,6 +13,10 @@ export class ErrorService implements HttpErrorHandler {
   constructor(private runtime: Runtime, private logger: RuntimeLogger) {}
 
   async handle(error: unknown, ctx: Context): Promise<HttpResponse> {
+    if (this.isHttpResponse(error)) {
+      return error as HttpResponse;
+    }
+
     if (error instanceof HttpErrorBase) {
       this.log(error, ctx);
       return error.asHttpResponse();
@@ -32,12 +36,23 @@ export class ErrorService implements HttpErrorHandler {
     return internalError.asHttpResponse();
   }
 
-  private log(error: HttpErrorBase, ctx: Context): void {
+  private isHttpResponse(error: unknown): boolean {
+    return (
+      typeof error === "object" &&
+      error !== null &&
+      "status" in error &&
+      "headers" in error
+    );
+  }
+
+  private log(error: HttpErrorBase, _ctx: Context): void {
     if (this.runtime.config.logging !== "verbose") return;
 
     const errRes = error.asHttpResponse();
-    if (errRes.status >= 500)
+    if (errRes.status >= 500) {
       this.logger.error(`[ERR${errRes.status}] ${error.message}`);
-    else this.logger.debug(`[ERR${errRes.status}] ${error.message}`);
+    } else {
+      this.logger.debug(`[ERR${errRes.status}] ${error.message}`);
+    }
   }
 }
