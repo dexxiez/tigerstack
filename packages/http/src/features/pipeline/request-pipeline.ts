@@ -1,3 +1,4 @@
+import { HTTP_STATUS } from "src/constants/http.ts";
 import { HttpRequest, HttpResponse } from "../../types/http.interfaces.ts";
 import { Middleware } from "./middleware.ts";
 
@@ -19,11 +20,12 @@ export class MiddlewarePipeline {
       currentRequest = await m.request(currentRequest);
     }
 
-    // Here you'd actually handle the route and get a response
     let response: HttpResponse = {
-      status: 500,
-      headers: {},
-      body: "Internal Caught",
+      status: HTTP_STATUS.MR_IS_TEAPOT,
+      headers: {
+        "Content-Type": "text/plain",
+      },
+      body: "Oh, no. Anyway.",
     };
 
     // Backward pass through middleware
