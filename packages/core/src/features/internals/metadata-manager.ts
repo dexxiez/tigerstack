@@ -55,4 +55,8 @@ export class MetadataManager {
     const existing = this.getMetadata<T>(key, target, propertyKey) || ({} as T);
     this.setMetadata(key, { ...existing, ...value }, target, propertyKey);
   }
+
+  static isBlankObject(obj: object): Boolean {
+    return Object.keys(obj).length === 0;
+  }
 }
