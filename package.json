@@ -1,9 +1,10 @@
 {
   "name": "@tigerstack/source",
-  "version": "0.0.0",
+  "version": "0.0.0-alpha1",
   "license": "MIT",
   "scripts": {
-    "prepare": "husky"
+    "prepare": "husky",
+    "version-sync": "tsx scripts/version-sync.ts"
   },
   "private": true,
   "devDependencies": {

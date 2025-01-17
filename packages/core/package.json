@@ -1,13 +1,19 @@
 {
   "name": "@tigerstack/core",
-  "version": "0.0.1",
+  "version": "0.0.0-alpha1",
   "private": false,
   "type": "module",
+  "scripts": {
+    "publish": "pnpm publish --access public"
+  },
   "dependencies": {
     "chalk": "4.1.2",
     "reflect-metadata": "0.2.2",
     "tslib": "^2.3.0"
   },
+  "files": [
+    "dist"
+  ],
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
