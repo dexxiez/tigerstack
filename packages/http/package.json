@@ -1,8 +1,8 @@
 {
   "name": "@tigerstack/http",
-  "version": "0.0.0-alpha1",
-  "private": false,
+  "version": "0.0.0-alpha2",
   "type": "module",
+  "private": false,
   "scripts": {
     "publish": "pnpm publish --access public"
   },
@@ -13,7 +13,7 @@
   },
   "publishConfig": {
     "dependencies": {
-      "@tigerstack/core": "0.0.0-alpha1"
+      "@tigerstack/core": "0.0.0-alpha2"
     }
   },
   "devDependencies": {
