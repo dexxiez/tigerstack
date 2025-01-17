@@ -1,4 +1,5 @@
-import { HttpHeader } from "src/types/http.types.ts";
+import { HTTP_STATUS } from "../../../constants/http.ts";
+import { HttpHeader } from "../../../types/http.types.ts";
 import { HttpErrorBase } from "../http-error-base.ts";
 
 export class NotImplementedError extends HttpErrorBase {
@@ -7,7 +8,12 @@ export class NotImplementedError extends HttpErrorBase {
     additionalHeaders?: Partial<Record<HttpHeader, string>>,
     additionalBody?: Record<string, unknown>,
   ) {
-    super("NOT_IMPLEMENTED", message, additionalHeaders, additionalBody);
+    super(
+      HTTP_STATUS.NOT_IMPLEMENTED,
+      message,
+      additionalHeaders,
+      additionalBody,
+    );
   }
   protected override getDefaultMessage(): string {
     return "Resource Not Implemented";
