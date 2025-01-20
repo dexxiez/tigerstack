@@ -4,6 +4,7 @@ import { NotFoundError } from "../errors/definitions/not-found.error.ts";
 import { HttpMethod } from "../../types/http.types.ts";
 import { HttpResponse } from "../../types/http.interfaces.ts";
 import { HTTP_STATUS } from "../../constants/http.ts";
+import { extractParameters } from "../../decorators/params.ts";
 
 interface RouteMatch {
   handler: (...args: any[]) => any;
@@ -29,15 +30,28 @@ export class RouterService {
 
         const match = this.matchRoute(route.methodPath, remainingPath);
         if (match) {
-          const result = await route.ref(match.params);
-          return {
-            status: HTTP_STATUS.ACCEPTED,
-            headers: {
-              "Content-Type":
-                typeof result === "string" ? "text/plain" : "application/json",
-            },
-            body: result,
-          };
+          try {
+            const params = extractParameters(
+              match.params,
+              controller.ref, // Key change here - use instance instead of ref
+              route.methodName,
+            );
+
+            const result = await route.ref.apply(controller.ref, params);
+            return {
+              status: HTTP_STATUS.OK, // Changed from ACCEPTED to OK
+              headers: {
+                "Content-Type":
+                  typeof result === "string"
+                    ? "text/plain"
+                    : "application/json",
+              },
+              body: result,
+            };
+          } catch (error) {
+            console.error("Error handling route:", error);
+            throw error; // Re-throw to be handled by error middleware
+          }
         }
       }
     }
@@ -48,7 +62,13 @@ export class RouterService {
   private matchRoute(
     routePath: string,
     requestPath: string,
-  ): RouteMatch | null {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
+  ): { params: Record<string, string>; handler: Function } | null {
+    // Handle root path special case
+    if (routePath === "/" && requestPath === "/") {
+      return { params: {}, handler: () => ({}) };
+    }
+
     const routeParts = routePath.split("/").filter(Boolean);
     const requestParts = requestPath.split("/").filter(Boolean);
 

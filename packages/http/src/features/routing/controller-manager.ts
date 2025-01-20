@@ -3,13 +3,14 @@ import { RuntimeLogger } from "../runtime/runtime-logger.ts";
 import { Runtime } from "../runtime/runtime.ts";
 import { MetadataManager } from "@tigerstack/core/internals";
 import Table from "cli-table3";
-import { HttpMethod } from "src/types/http.types.ts";
+import { HttpMethod } from "../../types/http.types.ts";
 
 type Handler = (...args: any[]) => any;
 
 interface RouteInfo {
   method: HttpMethod;
   methodPath: string;
+  methodName: string;
   ref: Handler;
 }
 
@@ -146,6 +147,7 @@ export class ControllerManager {
       .map((name) => ({
         method: MetadataManager.getMetadata("httpMethod", prototype, name),
         methodPath: MetadataManager.getMetadata("routePath", prototype, name),
+        methodName: name,
         ref: prototype[name].bind(controller.ref),
       }))
       .filter((m) => !MetadataManager.isBlankObject(m.method))

@@ -13,6 +13,14 @@ export class ErrorService implements HttpErrorHandler {
   constructor(private runtime: Runtime, private logger: RuntimeLogger) {}
 
   async handle(error: unknown, ctx: Context): Promise<HttpResponse> {
+    if (this.runtime.config.logging === "verbose")
+      console.error("Error caught:", error);
+
+    if (error instanceof Error) {
+      if (this.runtime.config.logging === "verbose")
+        console.error("Stack trace:", error.stack);
+    }
+
     if (this.isHttpResponse(error)) {
       return error as HttpResponse;
     }
@@ -31,7 +39,9 @@ export class ErrorService implements HttpErrorHandler {
       return notImplementedError.asHttpResponse();
     }
 
-    const internalError = new InternalServerError();
+    const internalError = new InternalServerError(
+      error instanceof Error ? error.message : "Unknown error occurred",
+    );
     this.log(internalError, ctx);
     return internalError.asHttpResponse();
   }
@@ -45,9 +55,8 @@ export class ErrorService implements HttpErrorHandler {
     );
   }
 
-  private log(error: HttpErrorBase, _ctx: Context): void {
-    if (this.runtime.config.logging !== "verbose") return;
-
+  private log(error: HttpErrorBase, ctx: Context): void {
+    // Always log in debug mode until we fix this
     const errRes = error.asHttpResponse();
     if (errRes.status >= 500) {
       this.logger.error(`[ERR${errRes.status}] ${error.message}`);

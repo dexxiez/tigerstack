@@ -5,6 +5,7 @@ import { Middleware } from "./features/pipeline/middleware.ts";
 import type { ConfigurableModule } from "@tigerstack/core";
 import { RouterMiddleware } from "./middleware/router.middleware.ts";
 import { BannerMiddleware } from "./middleware/banner.middleware.ts";
+import { RequestContextMiddleware } from "./middleware/request-context.middleware.ts";
 
 @Inject(Runtime, RouterMiddleware)
 export class HTTPTigerMod
@@ -38,6 +39,10 @@ export class HTTPTigerMod
   }
 
   private getInternalMiddleware(): Middleware[] {
-    return [new BannerMiddleware(), this.routerMiddleware];
+    return [
+      new RequestContextMiddleware(),
+      this.routerMiddleware,
+      new BannerMiddleware(),
+    ];
   }
 }
