@@ -1,6 +1,6 @@
 {
   "name": "@tigerstack/http",
-  "version": "0.0.0-alpha2",
+  "version": "0.0.0-alpha3",
   "type": "module",
   "private": false,
   "scripts": {
@@ -13,7 +13,7 @@
   },
   "publishConfig": {
     "dependencies": {
-      "@tigerstack/core": "0.0.0-alpha2"
+      "@tigerstack/core": "0.0.0-alpha3"
     }
   },
   "devDependencies": {
