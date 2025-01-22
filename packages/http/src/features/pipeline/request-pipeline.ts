@@ -29,7 +29,7 @@ export class MiddlewarePipeline {
     };
 
     // Backward pass through middleware
-    for (const m of this.middleware.reverse()) {
+    for (const m of [...this.middleware].reverse()) {
       response = await m.response(response);
     }
 

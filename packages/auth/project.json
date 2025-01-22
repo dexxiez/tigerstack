@@ -1,0 +1,40 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "name": "auth",
+  "sourceRoot": "packages/auth/src",
+  "projectType": "library",
+  "targets": {
+    "type-check": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["^build"],
+      "options": {
+        "cwd": "packages/auth",
+        "commands": ["tsc --noEmit"]
+      }
+    },
+    "dev": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["^build"],
+      "options": {
+        "cwd": "packages/auth",
+        "commands": ["tsx watch src/index.ts"]
+      }
+    },
+    "testing": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["^build"],
+      "options": {
+        "cwd": "packages/auth",
+        "commands": ["tsx watch src/testing.ts"]
+      }
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["^build"],
+      "options": {
+        "cwd": "packages/auth",
+        "commands": ["tsup"]
+      }
+    }
+  }
+}

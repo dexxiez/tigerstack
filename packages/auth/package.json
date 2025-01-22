@@ -1,5 +1,5 @@
 {
-  "name": "@tigerstack/http",
+  "name": "@tigerstack/auth",
   "version": "0.0.0-alpha3",
   "type": "module",
   "private": false,
@@ -15,20 +15,17 @@
   },
   "devDependencies": {
     "@tigerstack/core": "workspace:*",
-    "@types/koa": "2.15.0",
-    "cli-table3": "0.6.5",
-    "koa": "^2.15.3",
-    "uuid": "11.0.5"
+    "@tigerstack/http": "workspace:*"
   },
   "peerDependencies": {
-    "koa": "^2.15.3",
-    "@tigerstack/core": "0.0.0-alpha3"
+    "@tigerstack/core": "0.0.0-alpha3",
+    "@tigerstack/http": "0.0.0-alpha3"
   },
   "peerDependenciesMeta": {
-    "koa": {
-      "optional": true
-    },
     "@tigerstack/core": {
+      "optional": false
+    },
+    "@tigerstack/http": {
       "optional": false
     }
   },
@@ -41,17 +38,17 @@
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     },
-    "./adapters/koa": {
-      "types": "./dist/adapters/koa/index.d.ts",
-      "import": "./dist/adapters/koa/index.js",
-      "require": "./dist/adapters/koa/index.cjs"
+    "./oauth": {
+      "types": "./dist/oauth/index.d.ts",
+      "import": "./dist/oauth/index.js",
+      "require": "./dist/oauth/index.cjs"
     },
     "./package.json": "./package.json"
   },
   "typesVersions": {
     "*": {
       "adapters/koa": [
-        "./dist/adapters/koa/index.d.ts"
+        "./dist/oauth/index.d.ts"
       ]
     }
   },
