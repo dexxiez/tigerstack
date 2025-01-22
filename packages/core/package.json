@@ -4,7 +4,7 @@
   "private": false,
   "type": "module",
   "scripts": {
-    "publish": "pnpm publish --access public"
+    "publish-pkg": "pnpm publish --access public"
   },
   "dependencies": {
     "chalk": "4.1.2",
@@ -40,6 +40,11 @@
       "import": "./dist/logs/index.js",
       "require": "./dist/logs/index.cjs"
     },
+    "./skelton": {
+      "types": "./dist/skelton/index.d.ts",
+      "import": "./dist/skelton/index.js",
+      "require": "./dist/skelton/index.cjs"
+    },
     "./package.json": "./package.json"
   },
   "typesVersions": {
@@ -55,6 +60,9 @@
       ],
       "logs": [
         "./dist/logs/index.d.ts"
+      ],
+      "skelton": [
+        "./dist/skelton/index.d.ts"
       ]
     }
   },

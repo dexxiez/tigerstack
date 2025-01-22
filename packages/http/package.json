@@ -4,7 +4,7 @@
   "type": "module",
   "private": false,
   "scripts": {
-    "publish": "pnpm publish --access public"
+    "publish-pkg": "pnpm publish --access public"
   },
   "dependencies": {
     "@tigerstack/core": "workspace:*",
