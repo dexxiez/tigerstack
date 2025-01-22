@@ -1,6 +1,6 @@
 {
   "name": "@tigerstack/http",
-  "version": "0.0.0-alpha3",
+  "version": "0.0.0-alpha4",
   "type": "module",
   "private": false,
   "scripts": {
@@ -22,7 +22,7 @@
   },
   "peerDependencies": {
     "koa": "^2.15.3",
-    "@tigerstack/core": "0.0.0-alpha3"
+    "@tigerstack/core": "0.0.0-alpha4"
   },
   "peerDependenciesMeta": {
     "koa": {
