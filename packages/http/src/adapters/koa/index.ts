@@ -13,7 +13,9 @@ export class KoaAdapter implements HttpServer {
   static async create(httpErrorHandler: HttpErrorHandler): Promise<KoaAdapter> {
     const adapter = new KoaAdapter(httpErrorHandler);
     const { default: Koa } = await import("koa");
+    const { default: bodyParser } = await import("koa-bodyparser");
     adapter.server = new Koa();
+    adapter.server.use(bodyParser());
     return adapter;
   }
 
@@ -22,7 +24,7 @@ export class KoaAdapter implements HttpServer {
       method: ctx.method as HttpRequest["method"],
       headers: ctx.headers as HttpRequest["headers"],
       url: ctx.url,
-      body: ctx.request.toJSON(),
+      body: ctx.request.body,
     };
   }
 

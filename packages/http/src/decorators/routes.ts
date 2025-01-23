@@ -27,3 +27,10 @@ export const Get =
     MetadataManager.setMetadata("httpMethod", "GET", target, propertyKey);
     MetadataManager.setMetadata("routePath", routePath, target, propertyKey);
   };
+
+export const Post =
+  (routePath = "/") =>
+  (target: any, propertyKey: string) => {
+    MetadataManager.setMetadata("httpMethod", "POST", target, propertyKey);
+    MetadataManager.setMetadata("routePath", routePath, target, propertyKey);
+  };

@@ -1,5 +1,6 @@
 import { MetadataManager } from "@tigerstack/core/internals";
 import { RequestContext } from "../features/pipeline/request-context.ts";
+import { HttpHeader } from "../types/http.types.ts";
 
 // Parameter types that we can decorate
 export enum ParamType {
@@ -51,7 +52,7 @@ export const Query = (name?: string) =>
   createParamDecorator(ParamType.Query, name);
 export const Param = (name?: string) =>
   createParamDecorator(ParamType.Param, name);
-export const Header = (name?: string) =>
+export const Header = (name?: HttpHeader) =>
   createParamDecorator(ParamType.Header, name);
 
 // Helper to extract parameters

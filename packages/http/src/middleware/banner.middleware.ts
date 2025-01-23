@@ -2,7 +2,7 @@ import { Middleware } from "../features/pipeline/middleware.ts";
 import { HttpRequest, HttpResponse } from "../types/http.interfaces.ts";
 
 export class BannerMiddleware implements Middleware {
-  name = "AssertDominanceMiddleware";
+  name = "BannerMiddleware";
   async request(req: HttpRequest): Promise<HttpRequest> {
     return req;
   }

@@ -41,8 +41,8 @@ export class HTTPTigerMod
   private getInternalMiddleware(): Middleware[] {
     return [
       new RequestContextMiddleware(),
-      this.routerMiddleware,
       new BannerMiddleware(),
+      this.routerMiddleware,
     ];
   }
 }

@@ -19,7 +19,7 @@ export default defineConfig({
   splitting: false,
   treeshake: true,
   clean: true,
-  external: ["koa", "@tigerstack/*"],
+  external: ["koa", "koa-bodyparser", "@tigerstack/*"],
   outExtension({ format }) {
     return {
       js: format === "cjs" ? ".cjs" : ".js",

@@ -1,4 +1,4 @@
-export { Controller, Get } from "./routes.ts";
+export { Controller, Get, Post } from "./routes.ts";
 export {
   extractParameters,
   Header,
