@@ -34,7 +34,10 @@ export class TigerStack {
   /**
    * Register a module with optional configuration
    */
-  register<T, C = undefined>(module: Constructor<T>, config?: C): this {
+  register<T, C>(
+    module: Constructor<T & ConfigurableModule<C>>,
+    config?: C,
+  ): this {
     this.modules.set(module, config);
     return this;
   }
