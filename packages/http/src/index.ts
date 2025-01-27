@@ -10,6 +10,9 @@ export type {
   HttpServer,
   HttpServerConfig,
 } from "./types/server.interfaces.ts";
-export type { Middleware } from "./features/pipeline/middleware.ts";
+export type {
+  Middleware,
+  MiddlewareFactory,
+} from "./features/pipeline/middleware.ts";
 export type { HttpErrorStatus } from "./features/errors/http-error-base.ts";
 export type { HttpRequest, HttpResponse } from "./types/http.interfaces.ts";

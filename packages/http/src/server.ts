@@ -32,8 +32,12 @@ export class HTTPTigerMod
     await this.runtime.initialize();
     this.runtime.configure(this.config);
 
-    this.getInternalMiddleware().map((m) => this.runtime.registerMiddleware(m));
-    this.middleware.map((m) => this.runtime.registerMiddleware(m));
+    const internalMiddleware = this.getInternalMiddleware();
+    const externalMiddleware = await this.getExternalMiddleware();
+
+    [...internalMiddleware, ...externalMiddleware].forEach((m) =>
+      this.runtime.registerMiddleware(m),
+    );
 
     return this.runtime.start();
   }
@@ -44,5 +48,18 @@ export class HTTPTigerMod
       new BannerMiddleware(),
       this.routerMiddleware,
     ];
+  }
+
+  private async getExternalMiddleware(): Promise<Middleware[]> {
+    const standaloneMiddleware = this.config.middleware || [];
+
+    // Wait for all factories to create their middleware
+    const factoryMiddleware = await Promise.all(
+      (this.config.middlewareFactories || []).map((factory) =>
+        factory.create(),
+      ),
+    );
+
+    return [...factoryMiddleware, ...standaloneMiddleware];
   }
 }

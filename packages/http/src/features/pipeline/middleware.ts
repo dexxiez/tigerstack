@@ -5,3 +5,7 @@ export interface Middleware {
   request(req: HttpRequest): Promise<HttpRequest>;
   response(res: HttpResponse): Promise<HttpResponse>;
 }
+
+export interface MiddlewareFactory {
+  create(): Promise<Middleware>;
+}
