@@ -1,6 +1,6 @@
 {
   "name": "@tigerstack/auth",
-  "version": "0.0.0-alpha6",
+  "version": "0.0.0-alpha7",
   "type": "module",
   "private": false,
   "scripts": {
@@ -21,8 +21,8 @@
     "@types/jsonwebtoken": "9.0.8"
   },
   "peerDependencies": {
-    "@tigerstack/core": "0.0.0-alpha6",
-    "@tigerstack/http": "0.0.0-alpha6"
+    "@tigerstack/core": "0.0.0-alpha7",
+    "@tigerstack/http": "0.0.0-alpha7"
   },
   "peerDependenciesMeta": {
     "@tigerstack/core": {
