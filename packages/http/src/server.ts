@@ -29,7 +29,6 @@ export class HTTPTigerMod
   }
 
   async onBootstrap(): Promise<void> {
-    await this.runtime.initialize();
     this.runtime.configure(this.config);
 
     const internalMiddleware = this.getInternalMiddleware();
@@ -39,6 +38,7 @@ export class HTTPTigerMod
       this.runtime.registerMiddleware(m),
     );
 
+    await this.runtime.initialize();
     return this.runtime.start();
   }
 

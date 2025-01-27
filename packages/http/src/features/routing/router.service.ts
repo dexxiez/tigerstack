@@ -16,7 +16,8 @@ export class RouterService {
   constructor(private controllerManager: ControllerManager) {}
 
   async findRoute(method: HttpMethod, url: string): Promise<HttpResponse> {
-    const normalizedUrl = url === "/" ? "/" : url.replace(/\/$/, "");
+    const [pathPart] = url.split("?");
+    const normalizedUrl = pathPart === "/" ? "/" : pathPart.replace(/\/$/, "");
 
     for (const controller of this.controllerManager.controllers) {
       // First check if URL starts with controller base path
