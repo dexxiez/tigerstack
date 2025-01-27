@@ -42,18 +42,14 @@
       "require": "./dist/index.cjs"
     },
     "./oauth": {
-      "types": "./dist/oauth/index.d.ts",
+      "types": {
+        "import": "./dist/oauth/index.d.ts",
+        "require": "./dist/oauth/index.d.cts"
+      },
       "import": "./dist/oauth/index.js",
       "require": "./dist/oauth/index.cjs"
     },
     "./package.json": "./package.json"
-  },
-  "typesVersions": {
-    "*": {
-      "./oauth": [
-        "./dist/oauth/index.d.ts"
-      ]
-    }
   },
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",

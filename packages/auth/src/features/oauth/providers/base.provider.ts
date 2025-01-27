@@ -9,7 +9,7 @@ export abstract class BaseOAuthProvider<T extends OAuthConfig = OAuthConfig> {
 
   abstract get providerName(): string;
 
-  abstract getAuthUrl(): string;
+  abstract getAuthUrl(): Promise<string> | string;
 
   abstract getTokens(code: string): Promise<OAuthTokens>;
 

@@ -6,6 +6,7 @@ import {
   OAuthUserProfile,
 } from "../types/oauth.types.ts";
 import { BaseOAuthProvider } from "./base.provider.ts";
+import crypto from "node:crypto";
 
 export type EntraAuthConfig = OAuthConfig & {
   tenant?: string;
@@ -16,10 +17,12 @@ export class MicrosoftEntraProvider extends BaseOAuthProvider<EntraAuthConfig> {
   private readonly TOKEN_URL: string;
   private readonly API_URL = "https://graph.microsoft.com/v1.0";
 
+  private codeVerifier = ""; // TODO: This needs DB
+
   constructor(config: EntraAuthConfig) {
     const finalConfig = {
       ...config,
-      scope: config.scope || ["User.Read"],
+      scope: config.scope || ["profile", "openid"],
       tenant: config.tenant || "common", // Allow multi-tenant by default
     };
     super(finalConfig);
@@ -32,13 +35,19 @@ export class MicrosoftEntraProvider extends BaseOAuthProvider<EntraAuthConfig> {
     return "microsoft-entra";
   }
 
-  getAuthUrl(): string {
+  async getAuthUrl(): Promise<string> {
+    const codeVerifier = this.generateCodeVerifier();
+    // Store this somewhere to use in getTokens!
+    this.codeVerifier = codeVerifier;
+
     const params = new URLSearchParams({
       client_id: this.config.clientId,
       redirect_uri: this.config.callbackUrl,
       scope: this.config.scope!.join(" "),
       response_type: "code",
       response_mode: "query",
+      code_challenge: await this.generateCodeChallenge(codeVerifier),
+      code_challenge_method: "S256",
     });
     return `${this.AUTH_URL}?${params.toString()}`;
   }
@@ -51,6 +60,7 @@ export class MicrosoftEntraProvider extends BaseOAuthProvider<EntraAuthConfig> {
           client_id: this.config.clientId,
           client_secret: this.config.clientSecret,
           code,
+          code_verifier: this.codeVerifier, // Use the stored verifier
           redirect_uri: this.config.callbackUrl,
           grant_type: "authorization_code",
         }).toString(),
@@ -139,5 +149,25 @@ export class MicrosoftEntraProvider extends BaseOAuthProvider<EntraAuthConfig> {
       }
       throw error;
     }
+  }
+
+  private generateCodeVerifier(): string {
+    return crypto
+      .randomBytes(32)
+      .toString("base64")
+      .replace(/\+/g, "-")
+      .replace(/\//g, "_")
+      .replace(/=/g, "");
+  }
+
+  private async generateCodeChallenge(verifier: string): Promise<string> {
+    const hash = crypto
+      .createHash("sha256")
+      .update(verifier)
+      .digest("base64")
+      .replace(/\+/g, "-")
+      .replace(/\//g, "_")
+      .replace(/=/g, "");
+    return hash;
   }
 }
