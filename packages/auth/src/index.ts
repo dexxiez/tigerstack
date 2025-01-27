@@ -1,4 +1,11 @@
-export * from "./server.ts";
-export * from "./decorators/index.ts";
+// Not Types Exports
+export { ForbiddenError, UnauthorizedError } from "./errors/auth.errors.ts";
+export { AuthMiddleware } from "./middleware/auth.middleware.ts";
+export { AuthService } from "./services/auth.service.ts";
+export * from "./decorators/auth.decorators.ts";
 
-export type { Middleware } from "./features/pipeline/middleware.ts";
+// Types Exports
+export type {
+  AuthenticatedUser,
+  AuthenticationResult,
+} from "./types/auth.types.ts";

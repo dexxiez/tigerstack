@@ -101,6 +101,9 @@ importers:
 
   packages/auth:
     dependencies:
+      axios:
+        specifier: 1.7.9
+        version: 1.7.9
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2

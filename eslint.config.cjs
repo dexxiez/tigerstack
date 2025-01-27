@@ -35,8 +35,6 @@ module.exports = [
       "**/*.mjs",
     ],
     // Override or add rules here
-    rules: {
-      "@typescript-eslint/no-unsafe-function-type": "off",
-    },
+    rules: {},
   },
 ];

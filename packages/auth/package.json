@@ -1,12 +1,13 @@
 {
   "name": "@tigerstack/auth",
-  "version": "0.0.0-alpha3",
+  "version": "0.0.0-alpha5",
   "type": "module",
   "private": false,
   "scripts": {
     "publish-pkg": "pnpm publish --access public"
   },
   "dependencies": {
+    "axios": "1.7.9",
     "reflect-metadata": "0.2.2",
     "tslib": "^2.3.0"
   },
@@ -18,8 +19,8 @@
     "@tigerstack/http": "workspace:*"
   },
   "peerDependencies": {
-    "@tigerstack/core": "0.0.0-alpha3",
-    "@tigerstack/http": "0.0.0-alpha3"
+    "@tigerstack/core": "0.0.0-alpha5",
+    "@tigerstack/http": "0.0.0-alpha5"
   },
   "peerDependenciesMeta": {
     "@tigerstack/core": {
@@ -47,7 +48,7 @@
   },
   "typesVersions": {
     "*": {
-      "adapters/koa": [
+      "./oauth": [
         "./dist/oauth/index.d.ts"
       ]
     }
