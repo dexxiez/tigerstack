@@ -1,6 +1,6 @@
 {
   "name": "@tigerstack/auth",
-  "version": "0.0.0-alpha5",
+  "version": "0.0.0-alpha6",
   "type": "module",
   "private": false,
   "scripts": {
@@ -19,8 +19,8 @@
     "@tigerstack/http": "workspace:*"
   },
   "peerDependencies": {
-    "@tigerstack/core": "0.0.0-alpha5",
-    "@tigerstack/http": "0.0.0-alpha5"
+    "@tigerstack/core": "0.0.0-alpha6",
+    "@tigerstack/http": "0.0.0-alpha6"
   },
   "peerDependenciesMeta": {
     "@tigerstack/core": {

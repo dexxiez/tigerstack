@@ -1,6 +1,6 @@
 {
   "name": "@tigerstack/source",
-  "version": "0.0.0-alpha5",
+  "version": "0.0.0-alpha6",
   "license": "MIT",
   "scripts": {
     "prepare": "husky",
