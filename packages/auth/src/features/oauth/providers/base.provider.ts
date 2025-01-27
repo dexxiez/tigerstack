@@ -4,8 +4,8 @@ import {
   OAuthTokens,
 } from "../types/oauth.types.ts";
 
-export abstract class BaseOAuthProvider {
-  constructor(protected config: OAuthConfig) {}
+export abstract class BaseOAuthProvider<T extends OAuthConfig = OAuthConfig> {
+  constructor(protected config: T) {}
 
   abstract get providerName(): string;
 

@@ -19,3 +19,17 @@ export class ForbiddenError extends HttpErrorBase {
     return "Forbidden";
   }
 }
+
+export class TokenExpiredError extends UnauthorizedError {
+  constructor(message = "Token has expired") {
+    super(message);
+    this.name = "TokenExpiredError";
+  }
+}
+
+export class InvalidTokenError extends UnauthorizedError {
+  constructor(message = "Invalid token") {
+    super(message);
+    this.name = "InvalidTokenError";
+  }
+}
