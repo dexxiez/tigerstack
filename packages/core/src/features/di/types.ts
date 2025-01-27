@@ -12,6 +12,10 @@ export interface InjectableMetadata {
   [TEMP_INSTANCE]?: any;
 }
 
+export interface AsyncInitializable {
+  onInit(): Promise<void> | void;
+}
+
 export interface DebugInfo {
   target: string;
   resolutionAttempts: number;

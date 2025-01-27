@@ -1,4 +1,4 @@
-import { ForwardRef, DependencyToken } from "./types.ts";
+import { ForwardRef, DependencyToken, AsyncInitializable } from "./types.ts";
 import { getMetadata, setMetadata } from "./metadata.ts";
 import { createProxy } from "./proxy.ts";
 import { TEMP_INSTANCE } from "./symbols.ts";
@@ -7,6 +7,10 @@ import { Constructor } from "../internals/index.ts";
 
 function isForwardRef(dep: DependencyToken<any>): dep is ForwardRef<any> {
   return typeof dep === "function" && !dep.prototype;
+}
+
+function isAsyncInitializable(instance: any): instance is AsyncInitializable {
+  return typeof instance?.onInit === "function";
 }
 
 export async function inject<T extends object>(
@@ -81,6 +85,10 @@ export async function inject<T extends object>(
     Object.assign(realInstance, tempInstance);
     Object.assign(proxy, realInstance);
 
+    if (isAsyncInitializable(realInstance)) {
+      await realInstance.onInit();
+    }
+
     metadata.resolving = false;
     metadata[TEMP_INSTANCE] = undefined;
     metadata.instance = proxy;
@@ -88,6 +96,7 @@ export async function inject<T extends object>(
 
     return proxy as T;
   } catch (err) {
+    console.error(`[DI Debug] Failed to inject ${target.name}:`, err);
     metadata.resolving = false;
     metadata[TEMP_INSTANCE] = undefined;
     setMetadata(target, metadata);

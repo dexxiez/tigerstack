@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any -- Modular approach being defined so any is required to allow downstream to not hate life */
 import { inject } from "./features/di/index.ts";
 import { Logger } from "./features/logs/index.ts";
 import { FrameworkErrorHandler } from "./features/errors/index.ts";
@@ -57,19 +56,17 @@ export class TigerStack {
           throw err;
         });
 
-        // If module has a configure method and config was provided, call it
+        // Configuration happens after injection but before bootstrap
         if (config && isConfigurable(instance)) {
           instance.configure(config);
           this.logger.debug(`Configured ${Module.name}`);
         }
 
+        // Bootstrap happens after all initialization is complete
         if (hasOnBootstrap(instance)) {
-          if (instance.onBootstrap) {
-            instance.onBootstrap();
-          }
+          await instance.onBootstrap();
+          this.logger.debug(`Bootstrapped ${Module.name}`);
         }
-
-        this.logger.debug(`Bootstrapped ${Module.name}`);
       }
 
       this.logger.info(`Successfully initialized ${this.modules.size} modules`);
