@@ -56,6 +56,14 @@ export class Runtime {
       return;
     }
 
+    if (this.config.logging === "verbose") {
+      this.logger.debug(
+        `Middleware Registered: ${this.pipeline
+          .getRegisteredMiddleware()
+          .join(", ")}`,
+      );
+    }
+
     await this.controllerManager.loadControllers();
 
     if ("createPipeline" in this.server) {

@@ -1,6 +1,6 @@
-import { HTTP_STATUS } from "src/constants/http.ts";
 import { HttpRequest, HttpResponse } from "../../types/http.interfaces.ts";
 import { Middleware } from "./middleware.ts";
+import { RequestContext } from "./request-context.ts";
 
 export class MiddlewarePipeline {
   private middleware: Middleware[] = [];
@@ -14,25 +14,28 @@ export class MiddlewarePipeline {
 
   async execute(request: HttpRequest): Promise<HttpResponse> {
     let currentRequest = request;
+    let currentResponse: HttpResponse = RequestContext.getResponse();
 
-    // Forward pass through middleware
+    // Forward pass - modify both request and response
     for (const m of this.middleware) {
-      currentRequest = await m.request(currentRequest);
+      const result = await m.request(currentRequest, currentResponse);
+      currentRequest = result.req;
+      currentResponse = result.res;
+      RequestContext.setContext(currentRequest, currentResponse);
+      console.log("REQ", m.name, currentRequest, currentResponse);
     }
 
-    let response: HttpResponse = {
-      status: HTTP_STATUS.MR_IS_TEAPOT,
-      headers: {
-        "Content-Type": "text/plain",
-      },
-      body: "Oh, no. Anyway.",
-    };
-
-    // Backward pass through middleware
+    // Backward pass - modify response
     for (const m of [...this.middleware].reverse()) {
-      response = await m.response(response);
+      currentResponse = await m.response(currentResponse);
+      RequestContext.setContext(currentRequest, currentResponse);
+      console.log("RES", m.name, currentResponse);
     }
 
-    return response;
+    return currentResponse;
+  }
+
+  getRegisteredMiddleware(): string[] {
+    return this.middleware.map((m) => m.name);
   }
 }

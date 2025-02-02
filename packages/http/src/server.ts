@@ -5,7 +5,6 @@ import { Middleware } from "./features/pipeline/middleware.ts";
 import type { ConfigurableModule } from "@tigerstack/core";
 import { RouterMiddleware } from "./middleware/router.middleware.ts";
 import { BannerMiddleware } from "./middleware/banner.middleware.ts";
-import { RequestContextMiddleware } from "./middleware/request-context.middleware.ts";
 
 @Inject(Runtime, RouterMiddleware)
 export class HTTPTigerMod
@@ -34,20 +33,18 @@ export class HTTPTigerMod
     const internalMiddleware = this.getInternalMiddleware();
     const externalMiddleware = await this.getExternalMiddleware();
 
-    [...internalMiddleware, ...externalMiddleware].forEach((m) =>
-      this.runtime.registerMiddleware(m),
-    );
+    [
+      ...internalMiddleware,
+      ...externalMiddleware,
+      this.routerMiddleware,
+    ].forEach((m) => this.runtime.registerMiddleware(m));
 
     await this.runtime.initialize();
     return this.runtime.start();
   }
 
   private getInternalMiddleware(): Middleware[] {
-    return [
-      new RequestContextMiddleware(),
-      new BannerMiddleware(),
-      this.routerMiddleware,
-    ];
+    return [new BannerMiddleware()];
   }
 
   private async getExternalMiddleware(): Promise<Middleware[]> {

@@ -3,8 +3,8 @@ import { HttpRequest, HttpResponse } from "../types/http.interfaces.ts";
 
 export class BannerMiddleware implements Middleware {
   name = "BannerMiddleware";
-  async request(req: HttpRequest): Promise<HttpRequest> {
-    return req;
+  async request(req: HttpRequest, res: HttpResponse) {
+    return { req, res };
   }
 
   async response(res: HttpResponse): Promise<HttpResponse> {

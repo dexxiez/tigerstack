@@ -3,6 +3,7 @@ export * from "./server.ts";
 export * from "./decorators/index.ts";
 export { HTTP_STATUS } from "./constants/http.ts";
 export { HttpErrorBase } from "./features/errors/http-error-base.ts";
+export * from "./features/errors/definitions/index.ts";
 export { RequestContext } from "./features/pipeline/request-context.ts";
 
 // Types Exports

@@ -6,27 +6,33 @@ import { InternalServerError } from "./definitions/internal-server.error.ts";
 import { NotImplementedError } from "./definitions/not-implemented.error.ts";
 import { Runtime } from "../runtime/runtime.ts";
 import { RuntimeLogger } from "../runtime/runtime-logger.ts";
-import type { Context } from "koa";
 
 @Inject(forwardRef(() => Runtime), RuntimeLogger)
 export class ErrorService implements HttpErrorHandler {
   constructor(private runtime: Runtime, private logger: RuntimeLogger) {}
 
-  async handle(error: unknown, ctx: Context): Promise<HttpResponse> {
-    if (this.runtime.config.logging === "verbose")
+  async handle(error: unknown): Promise<HttpResponse> {
+    if (
+      this.runtime.config.logging === "verbose" &&
+      !this.isHttpResponse(error)
+    )
       console.error("Error caught:", error);
 
-    if (error instanceof Error) {
+    if (error instanceof Error && !this.isHttpResponse(error)) {
       if (this.runtime.config.logging === "verbose")
         console.error("Stack trace:", error.stack);
     }
 
     if (this.isHttpResponse(error)) {
+      if (this.runtime.config.logging === "verbose") {
+        const err = error as any;
+        this.logger.error(`[ERR${err?.status}] ${err?.message}`);
+      }
       return error as HttpResponse;
     }
 
     if (error instanceof HttpErrorBase) {
-      this.log(error, ctx);
+      this.log(error);
       return error.asHttpResponse();
     }
 
@@ -35,14 +41,14 @@ export class ErrorService implements HttpErrorHandler {
       error?.message.includes("Method not implemented.")
     ) {
       const notImplementedError = new NotImplementedError();
-      this.log(notImplementedError, ctx);
+      this.log(notImplementedError);
       return notImplementedError.asHttpResponse();
     }
 
     const internalError = new InternalServerError(
       error instanceof Error ? error.message : "Unknown error occurred",
     );
-    this.log(internalError, ctx);
+    this.log(internalError);
     return internalError.asHttpResponse();
   }
 
@@ -55,7 +61,7 @@ export class ErrorService implements HttpErrorHandler {
     );
   }
 
-  private log(error: HttpErrorBase, ctx: Context): void {
+  private log(error: HttpErrorBase): void {
     // Always log in debug mode until we fix this
     const errRes = error.asHttpResponse();
     if (errRes.status >= 500) {

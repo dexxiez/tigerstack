@@ -2,28 +2,24 @@ import { Inject } from "@tigerstack/core/di";
 import { ControllerManager } from "./controller-manager.ts";
 import { NotFoundError } from "../errors/definitions/not-found.error.ts";
 import { HttpMethod } from "../../types/http.types.ts";
-import { HttpResponse } from "../../types/http.interfaces.ts";
 import { HTTP_STATUS } from "../../constants/http.ts";
 import { extractParameters } from "../../decorators/params.ts";
-
-interface RouteMatch {
-  handler: (...args: any[]) => any;
-  params: Record<string, string>;
-}
-
-@Inject(ControllerManager)
+import { ErrorService } from "../errors/error.service.ts";
+import { RequestContext } from "../pipeline/request-context.ts";
+@Inject(ControllerManager, ErrorService)
 export class RouterService {
-  constructor(private controllerManager: ControllerManager) {}
+  constructor(
+    private controllerManager: ControllerManager,
+    private errorService: ErrorService,
+  ) {}
 
-  async findRoute(method: HttpMethod, url: string): Promise<HttpResponse> {
+  async findRoute(method: HttpMethod, url: string) {
     const [pathPart] = url.split("?");
     const normalizedUrl = pathPart === "/" ? "/" : pathPart.replace(/\/$/, "");
 
     for (const controller of this.controllerManager.controllers) {
-      // First check if URL starts with controller base path
       if (!normalizedUrl.startsWith(controller.path)) continue;
 
-      // Get the remaining path after the controller base
       const remainingPath = normalizedUrl.slice(controller.path.length) || "/";
 
       for (const route of controller.methods) {
@@ -34,13 +30,24 @@ export class RouterService {
           try {
             const params = extractParameters(
               match.params,
-              controller.ref, // Key change here - use instance instead of ref
+              controller.ref,
               route.methodName,
             );
 
+            // Inject user if the method has a @User() decorator
+            const userParamIndex = Reflect.getMetadata(
+              "userParamIndex",
+              controller.ref,
+              route.methodName,
+            );
+            if (userParamIndex !== undefined) {
+              const user = RequestContext.getCustomData("user"); // Fetch user from custom data
+              params[userParamIndex] = user;
+            }
+
             const result = await route.ref.apply(controller.ref, params);
             return {
-              status: HTTP_STATUS.OK, // Changed from ACCEPTED to OK
+              status: HTTP_STATUS.OK,
               headers: {
                 "Content-Type":
                   typeof result === "string"
@@ -48,23 +55,30 @@ export class RouterService {
                     : "application/json",
               },
               body: result,
+              handler: {
+                target: controller.ref,
+                methodName: route.methodName,
+              },
             };
           } catch (error) {
-            console.error("Error handling route:", error);
-            throw error; // Re-throw to be handled by error middleware
+            return {
+              ...(await this.errorService.handle(error)),
+              handler: {
+                target: controller.ref,
+                methodName: route.methodName,
+              },
+            };
           }
         }
       }
     }
-
     throw new NotFoundError(`No route found for ${method} ${url}`);
   }
 
   private matchRoute(
     routePath: string,
     requestPath: string,
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
-  ): { params: Record<string, string>; handler: Function } | null {
+  ): { params: Record<string, string>; handler: any } | null {
     // Handle root path special case
     if (routePath === "/" && requestPath === "/") {
       return { params: {}, handler: () => ({}) };

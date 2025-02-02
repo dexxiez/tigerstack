@@ -5,6 +5,7 @@ import type { HttpServer } from "../../types/server.interfaces.ts";
 import { MiddlewarePipeline } from "../../features/pipeline/request-pipeline.ts";
 import { HttpErrorHandler } from "../../types/http-error-handler.interface.ts";
 import { v4 } from "uuid";
+import { RequestContext } from "../../features/pipeline/request-context.ts";
 
 export class KoaAdapter implements HttpServer {
   private server: Koa | undefined;
@@ -60,12 +61,31 @@ export class KoaAdapter implements HttpServer {
       this.addRequestId(ctx);
       try {
         const req = KoaAdapter.handleRequest(ctx);
-        const res = await pipeline.execute(req);
-        KoaAdapter.handleResponse(ctx, res);
-        await next();
+        const initialResponse: HttpResponse = {
+          status: 200,
+          headers: {},
+          body: null,
+        };
+
+        // Initialize RequestContext with customData
+        await RequestContext.storage.run(
+          { request: req, response: initialResponse, customData: {} }, // <-- Add customData
+          async () => {
+            try {
+              const res = await pipeline.execute(req);
+              KoaAdapter.handleResponse(ctx, res);
+              await next();
+            } catch (error) {
+              const errRes = await this.httpErrorHandler.handle(error);
+              KoaAdapter.handleResponse(ctx, errRes);
+            }
+          },
+        );
       } catch (error) {
-        const errRes = await this.httpErrorHandler.handle(error, ctx);
+        const errRes = await this.httpErrorHandler.handle(error);
         KoaAdapter.handleResponse(ctx, errRes);
+      } finally {
+        RequestContext.clear();
       }
     };
   }
